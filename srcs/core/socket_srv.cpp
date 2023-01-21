@@ -6,21 +6,19 @@
 /*   By: moabid <moabid@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/21 17:01:18 by moabid            #+#    #+#             */
-/*   Updated: 2023/01/21 18:03:26 by moabid           ###   ########.fr       */
+/*   Updated: 2023/01/21 22:42:33 by moabid           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "socket_srv.hpp"
 
-SocketServer::SocketServer(int port)
+SocketServer::SocketServer(int port, std::string password)
 {
     // Create a socket
+    _password = password;
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd < 0)
-    {
-        std::cerr << "Error creating socket" << std::endl;
-        exit(-1);
-    }
+        err_and_ext("Error creating socket");
     // Fill in the address structure
     server_address.sin_family = AF_INET;
     server_address.sin_port = htons(port);
@@ -28,6 +26,7 @@ SocketServer::SocketServer(int port)
     // Bind the socket
     if (bind(sockfd, (struct sockaddr *) &server_address, sizeof(server_address)) < 0)
         err_and_ext("Error reading from socket");
+    authenticated_clients = std::unordered_map<int, bool>();
 }
 
 SocketServer::~SocketServer()
@@ -42,15 +41,11 @@ void SocketServer::start()
     listen(sockfd, 5);
 }
 
-int SocketServer::accept_connection(std::string password)
+int SocketServer::accept_connection()
 {
     socklen_t           client_len;
     struct sockaddr_in  client_address;
     int                 client_sockfd;
-
-    // better way to handle this password ?
-    if (password != "myshit")
-        err_and_ext("Bitch who are you ?");
 
     client_sockfd = accept(sockfd, (struct sockaddr *) &client_address, &client_len);
     if (client_sockfd < 0)
@@ -66,6 +61,7 @@ void SocketServer::read_write_loop(int client_sockfd)
     while (1)
     {
         bzero(buffer, 256);
+        //maybe use recv ?
         n = read(client_sockfd, buffer, 255);
         if (n < 0)
             err_and_ext("Error reading from socket");
@@ -77,35 +73,87 @@ void SocketServer::read_write_loop(int client_sockfd)
     }
 }
 
-Message SocketServer::parse_message(std::string message_str)
+Message SocketServer::parse_message(const std::string& buffer)
 {
-    Message message;
-    // Parse the message string into a Message object
-    return message;
+    std::string                 prefix, command;
+    std::vector<std::string>    parameters;
+    std::stringstream           ss(buffer);
+    std::string                 first_word;
+    
+    std::getline(ss, first_word, ' ');
+    if (first_word[0] == ':')
+    {
+        prefix = first_word.substr(1);
+        std::getline(ss, command, ' ');
+    }
+    else
+        command = first_word;
+    std::string param;
+    while (std::getline(ss, param, ' '))
+    {
+        // params trailing 
+        if (param[0] == ':')
+        {
+            param = param.substr(1);
+            std::string temp;
+            while (std::getline(ss, temp, ' '))
+                param += " " + temp;
+            parameters.push_back(param);
+            break;
+        }
+        else
+            parameters.push_back(param);
+    }
+    return Message(prefix, command, parameters);
 }
 
-void SocketServer::process_message(Message message, int client_sockfd)
+bool SocketServer::check_password(const std::string& password)
 {
+    return (password == _password);
+}
 
-    if (message.command == "JOIN")
+void SocketServer::process_message(Message& message, int client_socket)
+{
+    if (!authenticated_clients[client_socket])
     {
-        std::string response = "Welcome maybe ?";
-        send_message(response, client_sockfd);
+        if (message.getCommand() == "PASS")
+        {
+            // Maybe using some hashing for password later ?!
+            std::string password = message.getParametersIndex(0);
+            if (check_password(password))
+            {
+                authenticated_clients[client_socket] = true;
+                send_message(client_socket, "Authentication Successful\r\n");
+            }
+            else
+                send_message(client_socket, "Invalid password\r\n");
+        }
+        else
+            send_message(client_socket, "Authentication Required\r\n");
     }
-    else if (message.command == "PRIVMSG")
-    {
-        std::string response = "some shit here";
-        send_message(response, client_sockfd);
-    }
-    // here still have to add more commands ...
     else
     {
-        std::string response = "Unknown command";
-        send_message(response, client_sockfd);
+        if (message.getCommand() == "JOIN")
+        {
+            // Handle JOIN command
+        }
+        else if (message.getCommand() == "PRIVMSG")
+        {
+            // Handle PRIVMSG command
+        }
+        else if (message.getCommand() == "QUIT")
+        {
+            // Handle QUIT command
+            authenticated_clients[client_socket] = false;
+        }
+        else
+        {
+            // Handle other commands
+        }
     }
 }
 
-void SocketServer::send_message(std::string message, int client_sockfd)
+void SocketServer::send_message(int client_sockfd, std::string message)
 {
     int n;
 

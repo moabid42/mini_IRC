@@ -6,7 +6,7 @@
 /*   By: moabid <moabid@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/21 15:41:32 by moabid            #+#    #+#             */
-/*   Updated: 2023/01/21 17:40:11 by moabid           ###   ########.fr       */
+/*   Updated: 2023/01/21 20:37:59 by moabid           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 
 #include <iostream>
 #include <string>
+#include <sstream>
 #include <cstdbool>
 #include <unistd.h>
 #include <netinet/in.h>
@@ -21,6 +22,7 @@
 
 #include <vector>
 #include <map>
+#include <unordered_map>
 
 #define D_PORT 6667 //default port
 

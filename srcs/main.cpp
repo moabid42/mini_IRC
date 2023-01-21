@@ -6,7 +6,7 @@
 /*   By: moabid <moabid@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/21 15:48:05 by moabid            #+#    #+#             */
-/*   Updated: 2023/01/21 17:30:32 by moabid           ###   ########.fr       */
+/*   Updated: 2023/01/21 20:48:22 by moabid           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,10 +26,10 @@ bool    input_validator(int argc, char **argv)
 void    sockerserv_create(int port, char *pass)
 {
     std::string     password(pass);
-    SocketServer    server(port);
+    SocketServer    server(port, password);
     int             client_sockfd;
     
-    client_sockfd = server.accept_connection(password);
+    client_sockfd = server.accept_connection();
     server.read_write_loop(client_sockfd);
 }
 
