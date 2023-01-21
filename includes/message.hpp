@@ -1,27 +1,26 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   irc.hpp                                            :+:      :+:    :+:   */
+/*   message.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: moabid <moabid@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/01/21 15:41:32 by moabid            #+#    #+#             */
-/*   Updated: 2023/01/21 17:40:11 by moabid           ###   ########.fr       */
+/*   Created: 2023/01/21 17:36:01 by moabid            #+#    #+#             */
+/*   Updated: 2023/01/21 17:52:02 by moabid           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
-#include <iostream>
-#include <string>
-#include <cstdbool>
-#include <unistd.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
+#include "irc.hpp"
 
-#include <vector>
-#include <map>
-
-#define D_PORT 6667 //default port
-
-void    err_and_ext(std::string mssg);
+class Message
+{
+    public:
+        std::string                 prefix;
+        std::string                 command;
+        std::vector<std::string>    parameters;
+        
+        Message();
+        ~Message();
+};

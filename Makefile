@@ -6,7 +6,7 @@
 #    By: moabid <moabid@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/01/21 15:48:25 by moabid            #+#    #+#              #
-#    Updated: 2023/01/21 16:01:40 by moabid           ###   ########.fr        #
+#    Updated: 2023/01/21 18:14:52 by moabid           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -18,7 +18,7 @@ HEADERS 	= $(shell find . -name "*.hpp")
 OBJECTS 	= $(patsubst %.cpp, %.o, $(SOURCES))
 DEPENDS 	= $(patsubst %.cpp, %.d, $(SOURCES))
 
-CFLAGS 		= -Werror -Wall -Wextra -Wall -std=c++98
+CFLAGS 		= -g -std=c++98
 
 all: $(NAME)
 
