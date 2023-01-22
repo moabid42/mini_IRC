@@ -6,7 +6,7 @@
 /*   By: moabid <moabid@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/21 15:41:32 by moabid            #+#    #+#             */
-/*   Updated: 2023/01/21 20:37:59 by moabid           ###   ########.fr       */
+/*   Updated: 2023/01/22 10:36:12 by moabid           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,4 +26,4 @@
 
 #define D_PORT 6667 //default port
 
-void    err_and_ext(std::string mssg);
+void    err_and_ext(const char *mssg);

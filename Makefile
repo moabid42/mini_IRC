@@ -6,11 +6,13 @@
 #    By: moabid <moabid@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/01/21 15:48:25 by moabid            #+#    #+#              #
-#    Updated: 2023/01/21 18:14:52 by moabid           ###   ########.fr        #
+#    Updated: 2023/01/22 10:34:36 by moabid           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME        = ircserv
+
+CC			= g++
 
 SOURCES 	= $(shell find . -name "*.cpp")
 HEADERS 	= $(shell find . -name "*.hpp")

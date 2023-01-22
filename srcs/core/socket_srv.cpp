@@ -6,7 +6,7 @@
 /*   By: moabid <moabid@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/21 17:01:18 by moabid            #+#    #+#             */
-/*   Updated: 2023/01/21 22:42:33 by moabid           ###   ########.fr       */
+/*   Updated: 2023/01/22 11:32:07 by moabid           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ SocketServer::SocketServer(int port, std::string password)
     server_address.sin_addr.s_addr = INADDR_ANY;
     // Bind the socket
     if (bind(sockfd, (struct sockaddr *) &server_address, sizeof(server_address)) < 0)
-        err_and_ext("Error reading from socket");
+        err_and_ext("Error binding the socket");
     authenticated_clients = std::unordered_map<int, bool>();
 }
 
@@ -48,6 +48,7 @@ int SocketServer::accept_connection()
     int                 client_sockfd;
 
     client_sockfd = accept(sockfd, (struct sockaddr *) &client_address, &client_len);
+    std::cout << client_sockfd << std::endl;
     if (client_sockfd < 0)
         err_and_ext("Error reading from socket");
     return client_sockfd;
@@ -81,7 +82,7 @@ Message SocketServer::parse_message(const std::string& buffer)
     std::string                 first_word;
     
     std::getline(ss, first_word, ' ');
-    if (first_word[0] == ':')
+    if (first_word.front() == ':')
     {
         prefix = first_word.substr(1);
         std::getline(ss, command, ' ');
@@ -92,7 +93,7 @@ Message SocketServer::parse_message(const std::string& buffer)
     while (std::getline(ss, param, ' '))
     {
         // params trailing 
-        if (param[0] == ':')
+        if (param.front() == ':')
         {
             param = param.substr(1);
             std::string temp;
