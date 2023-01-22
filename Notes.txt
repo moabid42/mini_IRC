@@ -1,0 +1,3 @@
+Problems :
+- CTRL D not handled.
+- CTRL C in the client seg faults the server.

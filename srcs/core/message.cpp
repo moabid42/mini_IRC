@@ -6,7 +6,7 @@
 /*   By: moabid <moabid@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/21 17:48:25 by moabid            #+#    #+#             */
-/*   Updated: 2023/01/22 10:37:08 by moabid           ###   ########.fr       */
+/*   Updated: 2023/01/22 12:21:21 by moabid           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,9 +21,12 @@ Message::Message()
 
 Message::Message(std::string prefix, std::string cmd, std::vector<std::string> params)
 {
-    prefix = prefix;
+    this->prefix = prefix;
     command = cmd;
     parameters = params;
+    std::cout << "The prefix is " << this->prefix << std::endl;
+    std::cout << "The cmd is " << cmd << std::endl;
+    std::cout << "The parameters is " << parameters[0] << std::endl;
 }
 
 Message::~Message()
@@ -33,22 +36,22 @@ Message::~Message()
 
 ///////// Member Functions ////////////
 
-std::string Message::getPrefix() const
+std::string  const &Message::getPrefix() const 
 {
-    return command;
+    return this->prefix;
 }
 
-std::string Message::getCommand() const
+std::string  const &Message::getCommand() const 
 {
-    return prefix;
+    return this->command;
 }
 
-std::vector<std::string> Message::getParameters() const
+std::vector<std::string>  const &Message::getParameters() const 
 {
     return parameters;
 }
 
-std::string Message::getParametersIndex(int index) const
+std::string  const &Message::getParametersIndex(int index) const 
 {
     return parameters[index];
 }
