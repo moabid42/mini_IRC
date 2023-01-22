@@ -6,7 +6,7 @@
 /*   By: moabid <moabid@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/21 15:41:32 by moabid            #+#    #+#             */
-/*   Updated: 2023/01/22 10:36:12 by moabid           ###   ########.fr       */
+/*   Updated: 2023/01/22 17:56:07 by moabid           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,11 +19,16 @@
 #include <unistd.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
+#include <sys/select.h>
+#include <poll.h>
+#include <fcntl.h>
 
 #include <vector>
 #include <map>
 #include <unordered_map>
 
 #define D_PORT 6667 //default port
+#define MAX_CLIENTS 1024
+#define BUFSIZE 256
 
 void    err_and_ext(const char *mssg);

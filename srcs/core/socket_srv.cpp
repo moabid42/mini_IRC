@@ -6,7 +6,7 @@
 /*   By: moabid <moabid@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/21 17:01:18 by moabid            #+#    #+#             */
-/*   Updated: 2023/01/22 12:35:01 by moabid           ###   ########.fr       */
+/*   Updated: 2023/01/22 18:09:28 by moabid           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,63 +16,97 @@ SocketServer::SocketServer(int port, std::string password)
 {
     // Create a socket
     _password = password;
-    sockfd = socket(AF_INET, SOCK_STREAM, 0);
-    if (sockfd < 0)
+    _server_socket = socket(AF_INET, SOCK_STREAM, 0);
+    if (_server_socket < 0)
         err_and_ext("Error creating socket");
     // Fill in the address structure
     server_address.sin_family = AF_INET;
     server_address.sin_port = htons(port);
     server_address.sin_addr.s_addr = INADDR_ANY;
     // Bind the socket
-    if (bind(sockfd, (struct sockaddr *) &server_address, sizeof(server_address)) < 0)
+    if (bind(_server_socket, (struct sockaddr *) &server_address, sizeof(server_address)) < 0)
         err_and_ext("Error binding the socket");
     authenticated_clients = std::unordered_map<int, bool>();
 }
 
 SocketServer::~SocketServer()
 {
-    close(sockfd);
+    close(_server_socket);
 }
 
 //////////// Member Functions ///////////
 
 void SocketServer::start()
 {
-    listen(sockfd, 5);
+    listen(_server_socket, 5);
 }
 
-int SocketServer::accept_connection()
+void    SocketServer::accept_connection()
 {
-    socklen_t           client_len;
-    struct sockaddr_in  client_address;
-    int                 client_sockfd;
-
-    client_sockfd = accept(sockfd, (struct sockaddr *) &client_address, &client_len);
-    if (client_sockfd < 0)
-        err_and_ext("Error reading from socket");
-    return client_sockfd;
-}
-
-void SocketServer::read_write_loop(int client_sockfd)
-{
-    char buffer[256];
-    int n;
-
     while (1)
     {
-        bzero(buffer, 256);
-        //maybe use recv ?
-        n = read(client_sockfd, buffer, 255);
-        if (n < 0)
-            err_and_ext("Error reading from socket");
-        std::cout << "Received: " << buffer << std::endl;
-        // process the mssg here
-        std::string message_str(buffer);
-        message_str.pop_back();
-        Message *message = parse_message(message_str);
-        process_message(message, client_sockfd);
+        socklen_t           client_len;
+        struct sockaddr_in  client_address;
+        int                 client_sockfd;
+
+        client_sockfd = ::accept(_server_socket, (struct sockaddr *) &client_address, &client_len);
+        if (client_sockfd < 0)
+            err_and_ext("Error accepting connection");
+        authenticated_clients[client_sockfd] = false;
+        std::cout<< "we have " << client_sockfd << std::endl;
     }
 }
+
+void SocketServer::read_write_loop()
+{
+    struct pollfd   fds[MAX_CLIENTS];
+    int             nfds = 1;
+
+    fds[0].fd = _server_socket;
+    fds[0].events = POLLIN;
+    while (1)
+    {
+        int ret = poll(fds, nfds, -1);
+        if (ret < 0)
+        {
+            perror("poll");
+            continue;
+        }
+        if (fds[0].revents & POLLIN)
+        {
+            int client_socket = accept(_server_socket, nullptr, nullptr);
+            if (client_socket < 0)
+            {
+                perror("accept");
+                continue;
+            }
+            fcntl(client_socket, F_SETFL, O_NONBLOCK);
+            fds[nfds].fd = client_socket;
+            fds[nfds].events = POLLIN;
+            nfds++;
+        }
+        for (int i = 1; i < nfds; i++)
+        {
+            if (fds[i].revents & POLLIN)
+            {
+                char buffer[BUFSIZE];
+                int n;
+
+                bzero(buffer, BUFSIZE);
+                n = recv(fds[i].fd, buffer, 255, 0);
+                if (n < 0)
+                    err_and_ext("Error reading from socket");
+                std::cout << "Received: " << buffer << std::endl;
+                // process the mssg here
+                std::string message_str(buffer);
+                message_str.pop_back();
+                Message *message = parse_message(message_str);
+                process_message(message, fds[i].fd);
+            }
+        }
+    }
+}
+
 
 Message* SocketServer::parse_message(const std::string& buffer)
 {

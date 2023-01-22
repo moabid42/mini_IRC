@@ -6,7 +6,7 @@
 /*   By: moabid <moabid@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/21 16:17:46 by moabid            #+#    #+#             */
-/*   Updated: 2023/01/22 12:00:29 by moabid           ###   ########.fr       */
+/*   Updated: 2023/01/22 17:54:25 by moabid           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ class Message;
 class SocketServer
 {
     private:
-        int                             sockfd;
+        int                             _server_socket;
         std::string                     _password;
         struct sockaddr_in              server_address;
         std::unordered_map<int, bool>   authenticated_clients;
@@ -30,8 +30,8 @@ class SocketServer
         ~SocketServer();
     
         void    start();
-        int     accept_connection();
-        void    read_write_loop(int client_sockfd);
+        void    accept_connection();
+        void    read_write_loop();
         
         Message *parse_message(const std::string& buffer);
         bool    check_password(const std::string& password);

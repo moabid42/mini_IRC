@@ -6,7 +6,7 @@
 /*   By: moabid <moabid@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/21 15:48:05 by moabid            #+#    #+#             */
-/*   Updated: 2023/01/22 11:28:33 by moabid           ###   ########.fr       */
+/*   Updated: 2023/01/22 14:33:20 by moabid           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,11 +27,10 @@ void    sockerserv_create(int port, char *pass)
 {
     std::string     password(pass);
     SocketServer    server(port, password);
-    int             client_sockfd;
     
     server.start();
-    client_sockfd = server.accept_connection();
-    server.read_write_loop(client_sockfd);
+    // server.accept_connection();
+    server.read_write_loop();
 }
 
 int main(int argc, char **argv)
