@@ -1,3 +1,8 @@
 Problems :
 - CTRL D not handled.
 - CTRL C in the client seg faults the server.
+
+
+Something you might consider to add :
+- Change the send_message function to handle variadic function.
+- Add hashing for the irc password

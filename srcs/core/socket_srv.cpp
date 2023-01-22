@@ -6,7 +6,7 @@
 /*   By: moabid <moabid@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/21 17:01:18 by moabid            #+#    #+#             */
-/*   Updated: 2023/01/22 18:09:28 by moabid           ###   ########.fr       */
+/*   Updated: 2023/01/23 00:32:28 by moabid           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,8 @@ SocketServer::SocketServer(int port, std::string password)
     // Bind the socket
     if (bind(_server_socket, (struct sockaddr *) &server_address, sizeof(server_address)) < 0)
         err_and_ext("Error binding the socket");
-    authenticated_clients = std::unordered_map<int, bool>();
+    authenticated_clients = std::map<int, bool>();
+    _channels = std::map<std::string, Channel>();
 }
 
 SocketServer::~SocketServer()
@@ -41,23 +42,23 @@ void SocketServer::start()
     listen(_server_socket, 5);
 }
 
-void    SocketServer::accept_connection()
-{
-    while (1)
-    {
-        socklen_t           client_len;
-        struct sockaddr_in  client_address;
-        int                 client_sockfd;
+// void    SocketServer::accept_connection()
+// {
+//     while (1)
+//     {
+//         socklen_t           client_len;
+//         struct sockaddr_in  client_address;
+//         int                 client_sockfd;
 
-        client_sockfd = ::accept(_server_socket, (struct sockaddr *) &client_address, &client_len);
-        if (client_sockfd < 0)
-            err_and_ext("Error accepting connection");
-        authenticated_clients[client_sockfd] = false;
-        std::cout<< "we have " << client_sockfd << std::endl;
-    }
-}
+//         client_sockfd = ::accept(_server_socket, (struct sockaddr *) &client_address, &client_len);
+//         if (client_sockfd < 0)
+//             err_and_ext("Error accepting connection");
+//         authenticated_clients[client_sockfd] = false;
+//         std::cout<< "we have " << client_sockfd << std::endl;
+//     }
+// }
 
-void SocketServer::read_write_loop()
+void SocketServer::connect()
 {
     struct pollfd   fds[MAX_CLIENTS];
     int             nfds = 1;
@@ -169,21 +170,34 @@ void SocketServer::process_message(Message *message, int client_socket)
     }
     else
     {
-        if (message->getCommand() == "JOIN")
+        // here we have to add the username check function and the NICK command to set the username
+        if (username_set() == true)
         {
-            // Handle JOIN command
+            if (message->getCommand() == "JOIN")
+            {
+                std::string channel_name = message->getParametersIndex(0);
+                if (_channels.count(channel_name) == 0)
+                    _channels[channel_name] = Channel(channel_name);
+                // Have to do some changes here so that we add the user only after having the username set 
+                _channels[channel_name].addUser(client_socket);
+                send_message(client_socket, std::to_string(client_socket));
+                send_message(client_socket, "just joined a channel\b");
+                send_message(client_socket, channel_name);
+                send_message(client_socket, "\r\n");
+                
+            }
+            else if (message->getCommand() == "PRIVMSG")
+            {
+                // Handle PRIVMSG command
+            }
+            else if (message->getCommand() == "QUIT")
+            {
+                // Handle QUIT command
+                authenticated_clients[client_socket] = false;
+            }
+            else
+                send_message(client_socket, "Command not Found\r\n");
         }
-        else if (message->getCommand() == "PRIVMSG")
-        {
-            // Handle PRIVMSG command
-        }
-        else if (message->getCommand() == "QUIT")
-        {
-            // Handle QUIT command
-            authenticated_clients[client_socket] = false;
-        }
-        else
-            send_message(client_socket, "Command not Found\r\n");
     }
 }
 
@@ -195,3 +209,11 @@ void SocketServer::send_message(int client_sockfd, std::string message)
     if (n < 0)
         err_and_ext("Error writing to socket");
 }
+
+void SocketServer::broadcastMessage(std::string message, Channel* channel)
+{
+    if(channel)
+        for (auto user : channel->getUsers())
+            send_message(user.first, message);
+}
+
