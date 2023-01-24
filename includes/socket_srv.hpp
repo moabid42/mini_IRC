@@ -6,7 +6,7 @@
 /*   By: moabid <moabid@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/21 16:17:46 by moabid            #+#    #+#             */
-/*   Updated: 2023/01/23 23:06:27 by moabid           ###   ########.fr       */
+/*   Updated: 2023/01/24 11:50:36 by moabid           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ class SocketServer
         int                               _server_socket;
         std::string                       _password;
         struct sockaddr_in                server_address;
-        std::map<int, std::string>        authenticated_clients;
+        std::map<int, std::pair<std::string, std::string> >        authenticated_clients;
         std::map<std::string, Channel>    _channels;
 
     public:

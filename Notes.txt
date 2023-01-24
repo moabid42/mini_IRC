@@ -4,5 +4,5 @@ Problems :
 
 
 Something you might consider to add :
-- Change the send_message function to handle variadic function.
 - Add hashing for the irc password
+- Fixing the channel class

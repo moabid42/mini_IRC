@@ -6,7 +6,7 @@
 /*   By: moabid <moabid@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/21 17:01:18 by moabid            #+#    #+#             */
-/*   Updated: 2023/01/23 23:37:55 by moabid           ###   ########.fr       */
+/*   Updated: 2023/01/24 12:07:42 by moabid           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ SocketServer::SocketServer(int port, std::string password)
     // Bind the socket
     if (bind(_server_socket, (struct sockaddr *) &server_address, sizeof(server_address)) < 0)
         err_and_ext("Error binding the socket");
-    authenticated_clients = std::map<int, std::string>();
+    authenticated_clients = std::map<int, std::pair<std::string, std::string> >();
     _channels = std::map<std::string, Channel>();
 }
 
@@ -101,7 +101,9 @@ void SocketServer::connect()
                 // process the mssg here
                 std::string message_str(buffer);
                 message_str.pop_back();
+                std::cerr << "smt" << std::endl;
                 Message *message = parse_message(message_str);
+                std::cerr << "smt" << std::endl;
                 process_message(message, fds[i].fd);
             }
         }
@@ -140,6 +142,8 @@ Message* SocketServer::parse_message(const std::string& buffer)
         else
             parameters.push_back(param);
     }
+    // if (parameters.empty())
+    //     return new Message(prefix, command, std::vector<std::string>());
     return new Message(prefix, command, parameters);
 }
 
@@ -151,7 +155,8 @@ bool SocketServer::check_password(const std::string& password)
 
 void SocketServer::process_message(Message *message, int client_socket)
 {
-    if (authenticated_clients[client_socket] == "")
+        std::cerr << "smt" << std::endl;
+    if (authenticated_clients[client_socket].second == "")
     {
         if (message->getCommand() == "PASS")
         {
@@ -159,7 +164,7 @@ void SocketServer::process_message(Message *message, int client_socket)
             std::string password = message->getParametersIndex(0);
             if (check_password(password))
             {
-                authenticated_clients[client_socket] = "exist";
+                authenticated_clients[client_socket].second = "anonym" + std::to_string(client_socket);
                 send_message(client_socket, "Authentication Successful\r\n");
             }
             else
@@ -170,47 +175,91 @@ void SocketServer::process_message(Message *message, int client_socket)
     }
     else
     {
-        // here we have to add the username check function and the NICK command to set the username
-        // if (username_set() == true)
-        // {
-            if (message->getCommand() == "NICK")
+        if (message->getCommand() == "USER")
+        {
+            // have to check if all the prameters are given 
+            // USER <username> <hostname> <servername> <realname>
+            std::string username = message->getParametersIndex(0);
+            std::string hostname = message->getParametersIndex(1);
+            std::string servername = message->getParametersIndex(2);
+            std::string realname = message->getParametersIndex(3);
+            // Check if the provided username is already in use by another user
+            bool username_in_use = false;
+            std::map<int, std::pair<std::string, std::string> >::iterator it;
+            for (it = authenticated_clients.begin(); it != authenticated_clients.end(); ++it)
             {
-                std::map<int, std::string>::iterator it = authenticated_clients.find(client_socket);
-                if (it != authenticated_clients.end())
+                if (it->second.first == username)
                 {
-                    std::string old_nickname = it->second;
-                    it->second = message->getParametersIndex(0);
-                    send_message(client_socket, "Your nickname has been changed from " + old_nickname + " to " + message->getParametersIndex(0) + "\n");
-                } else
-                    send_message(client_socket, "You must be authenticated to change your nickname.\r\n");
+                    username_in_use = true;
+                    break;
+                }
             }
-            else if (authenticated_clients[client_socket] != ""
-                    && authenticated_clients[client_socket] != "exist")
+            if (username_in_use)
+                send_message(client_socket, "Error: The username " + username + " is already in use.\r\n");
+        
+            // Register the user's username, hostname, servername, and realname
+            authenticated_clients[client_socket] = std::make_pair(username, realname);
+            send_message(client_socket, "Welcome to the server " + username + "\r\n");
+        }
+        else if (authenticated_clients[client_socket].second != ""
+                && authenticated_clients[client_socket].second != "anonym" + std::to_string(client_socket))
+        {
+            if (message->getCommand() == "JOIN")
             {
-                if (message->getCommand() == "JOIN")
+                std::string channel_name = message->getParametersIndex(0);
+                std::map<std::string, Channel>::iterator it = _channels.find(channel_name);
+                if (it != _channels.end())
                 {
-                    // std::string channel_name = message->getParametersIndex(0);
-                    // if (_channels.count(channel_name) == 0)
-                    //     _channels[channel_name] = Channel(channel_name);
-                    // // Have to do some changes here so that we add the user only after having the username set 
-                    // std::map<int, std::string>::iterator it = authenticated_clients.find(client_socket);
-                    // std::string nick_name = it->second;
-                    // _channels[channel_name].addUser(client_socket, nick_name);
-                    // send_message(client_socket, std::to_string(client_socket) + "just joined a channel\b" + channel_name + "\r\n");
-                }
-                else if (message->getCommand() == "PRIVMSG")
-                {
-                    // Handle PRIVMSG command
-                }
-                else if (message->getCommand() == "QUIT")
-                {
-                    // Handle QUIT command
-                    authenticated_clients[client_socket] = "dontexist";
+                    // Channel exists, join the user
+                    std::map<int, std::pair<std::string, std::string> >::iterator user_it = authenticated_clients.find(client_socket);
+                    std::string nick_name = user_it->second.second;
+                    it->second.addUser(client_socket, nick_name);
+                    send_message(client_socket, "You have joined the channel " + channel_name + "\r\n");
                 }
                 else
-                    send_message(client_socket, "Command not Found\r\n");
+                {
+                    // Channel does not exist, create it and join the user
+                    _channels[channel_name] = Channel(channel_name);
+                    std::map<int, std::pair<std::string, std::string> >::iterator user_it = authenticated_clients.find(client_socket);
+                    std::string nick_name = user_it->second.second;
+                    _channels[channel_name].addUser(client_socket, nick_name);
+                    send_message(client_socket, "The channel " + channel_name + " has been created and you have joined it.\r\n");
+                }
             }
-        // }
+            else if (message->getCommand() == "NICK")
+            {
+                bool username_in_use = false;
+                std::map<int, std::pair<std::string, std::string> >::iterator it;
+                for (it = authenticated_clients.begin(); it != authenticated_clients.end(); ++it) {
+                    if (it->second.first == message->getParametersIndex(0))
+                    {
+                        username_in_use = true;
+                        break;
+                    }
+                }
+                if (username_in_use)
+                    send_message(client_socket, "Error: The username " + message->getParametersIndex(0) + " is already in use.\r\n");
+                else
+                {
+                    std::string old_nickname = it->second.second;
+                    it->second.second = message->getParametersIndex(0);
+                    send_message(client_socket, "Your nickname has been changed from " + old_nickname + " to " + message->getParametersIndex(0) + "\n");
+                }
+            }
+            else if (message->getCommand() == "PRIVMSG")
+            {
+                // Handle PRIVMSG command
+            }
+            else if (message->getCommand() == "QUIT")
+            {
+                // Handle QUIT command
+                authenticated_clients[client_socket].second = "";
+            }
+            else
+                send_message(client_socket, "Command not Found\r\n");
+        }
+        else
+            send_message(client_socket, "USER not set\r\n");
     }
 }
 

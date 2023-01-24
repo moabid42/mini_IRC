@@ -6,13 +6,19 @@
 /*   By: moabid <moabid@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/22 19:18:20 by moabid            #+#    #+#             */
-/*   Updated: 2023/01/23 00:22:59 by moabid           ###   ########.fr       */
+/*   Updated: 2023/01/24 11:08:17 by moabid           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "channel.hpp"
 
+Channel::Channel()
+{ }
+
 Channel::Channel(std::string name) : _name(name)
+{ }
+
+Channel::~Channel()
 { }
 
 std::string Channel::getName() const
@@ -60,8 +66,8 @@ void Channel::removeMode(std::string mode)
     _modes.erase(mode);
 }
 
-// void Channel::broadcastMessage(std::string message)
-// {
-//     // Send the message to the user's socket descriptor
-//     // You can use the send_message in SocketServer
-// }
+void Channel::broadcastMessage(std::string message)
+{
+    // Send the message to the user's socket descriptor
+    // You can use the send_message in SocketServer
+}

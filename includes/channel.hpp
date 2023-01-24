@@ -6,7 +6,7 @@
 /*   By: moabid <moabid@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/22 19:05:09 by moabid            #+#    #+#             */
-/*   Updated: 2023/01/23 00:22:54 by moabid           ###   ########.fr       */
+/*   Updated: 2023/01/24 11:08:04 by moabid           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,9 @@ class Channel
         std::map<std::string, std::string>              _modes; // mode as key and parameter as value
     
     public:
+        Channel();
         Channel(std::string name);
+        ~Channel();
     
         std::string getName() const;
         std::string getTopic() const;
@@ -37,5 +39,5 @@ class Channel
         void removeUser(int socket_fd);
         void addMode(std::string mode, std::string param);
         void removeMode(std::string mode);
-        // void broadcastMessage(std::string message);
+        void broadcastMessage(std::string message);
 };
