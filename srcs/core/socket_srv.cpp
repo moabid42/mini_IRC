@@ -6,7 +6,7 @@
 /*   By: moabid <moabid@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/21 17:01:18 by moabid            #+#    #+#             */
-/*   Updated: 2023/01/25 15:58:36 by moabid           ###   ########.fr       */
+/*   Updated: 2023/01/25 22:52:35 by moabid           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -190,12 +190,13 @@ void SocketServer::process_message(Message *message, int client_socket)
                 std::map<int, std::pair<std::string, std::string> >::iterator it;
                 for (it = authenticated_clients.begin(); it != authenticated_clients.end(); ++it)
                 {
-                    if (it->second.first == username)
+                    if (it->second.second == username)
                     {
                         username_in_use = true;
                         break;
                     }
                 }
+                std::cout << "We didn't find it\n"<<std::endl;
                 if (username_in_use)
                     send_message(client_socket, "Error: The username " + username + " is already in use.\r\n");
                 else

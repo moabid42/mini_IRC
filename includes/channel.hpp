@@ -6,7 +6,7 @@
 /*   By: moabid <moabid@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/22 19:05:09 by moabid            #+#    #+#             */
-/*   Updated: 2023/01/25 15:43:13 by moabid           ###   ########.fr       */
+/*   Updated: 2023/01/25 22:48:55 by moabid           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,10 +19,10 @@ class SocketServer;
 class Channel
 {
     private:
-        std::string                                     _name;
-        std::string                                     _topic;
-        std::map<int, std::string>                      _users; // socket descriptor as key and username as value
-        std::map<std::string, std::string>              _modes; // mode as key and parameter as value
+        std::string                         _name;
+        std::string                         _topic;
+        std::map<int, std::string>          _users; // socket descriptor as key and username as value
+        std::map<std::string, std::string>  _modes; // mode as key and parameter as value
     
     public:
         Channel();
