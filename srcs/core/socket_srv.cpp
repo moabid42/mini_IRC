@@ -6,7 +6,7 @@
 /*   By: moabid <moabid@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/21 17:01:18 by moabid            #+#    #+#             */
-/*   Updated: 2023/01/25 22:52:35 by moabid           ###   ########.fr       */
+/*   Updated: 2023/01/25 23:34:05 by moabid           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,7 +117,7 @@ Message* SocketServer::parse_message(const std::string& buffer)
     std::vector<std::string>    parameters;
     std::stringstream           ss(buffer);
     std::string                 first_word;
-    
+
     std::getline(ss, first_word, ' ');
     if (first_word.front() == ':')
     {
@@ -130,6 +130,8 @@ Message* SocketServer::parse_message(const std::string& buffer)
     while (std::getline(ss, param, ' '))
     {
         // params trailing 
+        if (param.empty())
+            break ;
         if (param.front() == ':')
         {
             param = param.substr(1);
@@ -142,8 +144,6 @@ Message* SocketServer::parse_message(const std::string& buffer)
         else
             parameters.push_back(param);
     }
-    // if (parameters.empty())
-    //     return new Message(prefix, command, std::vector<std::string>());
     return new Message(prefix, command, parameters);
 }
 

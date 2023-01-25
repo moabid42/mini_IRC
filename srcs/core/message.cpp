@@ -6,7 +6,7 @@
 /*   By: moabid <moabid@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/21 17:48:25 by moabid            #+#    #+#             */
-/*   Updated: 2023/01/25 15:31:30 by moabid           ###   ########.fr       */
+/*   Updated: 2023/01/25 23:36:05 by moabid           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,9 @@ Message::Message(std::string prefix, std::string cmd, std::vector<std::string> p
     parameters = params;
     std::cout << "The prefix is " << this->prefix << std::endl;
     std::cout << "The cmd is " << cmd << std::endl;
-    std::cout << "The parameters is " << parameters[0] << std::endl;
+    // std::cout << "the params contains " << params.empty() << std::endl;
+    // if (params.empty() == 0)
+    //     std::cout << "The parameters is " << parameters[0] << std::endl;
 }
 
 Message::~Message()
