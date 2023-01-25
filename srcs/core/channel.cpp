@@ -6,7 +6,7 @@
 /*   By: moabid <moabid@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/22 19:18:20 by moabid            #+#    #+#             */
-/*   Updated: 2023/01/24 11:08:17 by moabid           ###   ########.fr       */
+/*   Updated: 2023/01/25 15:45:09 by moabid           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,4 +70,11 @@ void Channel::broadcastMessage(std::string message)
 {
     // Send the message to the user's socket descriptor
     // You can use the send_message in SocketServer
+}
+
+void Channel::printUsers() const
+{
+    std::cout << "Users in channel " << _name << ":" << std::endl;
+    for (std::map<int, std::string>::const_iterator it = _users.begin(); it != _users.end(); it++)
+        std::cout << it->second << std::endl;
 }

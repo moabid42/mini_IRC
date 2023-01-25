@@ -6,7 +6,7 @@
 /*   By: moabid <moabid@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/21 16:17:46 by moabid            #+#    #+#             */
-/*   Updated: 2023/01/24 11:50:36 by moabid           ###   ########.fr       */
+/*   Updated: 2023/01/25 15:55:44 by moabid           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,4 +41,5 @@ class SocketServer
         void    process_message(Message *message, int client_socket);
         void    send_message(int client_sockfd, std::string message);
         void    broadcastMessage(std::string message, Channel* channel);
+        void    printAuthenticatedUsers();
 };

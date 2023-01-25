@@ -1,6 +1,7 @@
 Problems :
 - CTRL D not handled.
 - CTRL C in the client seg faults the server.
+- sending a random shit without any parameters seg faults
 
 
 Something you might consider to add :

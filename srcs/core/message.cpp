@@ -6,7 +6,7 @@
 /*   By: moabid <moabid@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/21 17:48:25 by moabid            #+#    #+#             */
-/*   Updated: 2023/01/22 12:21:21 by moabid           ###   ########.fr       */
+/*   Updated: 2023/01/25 15:31:30 by moabid           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,12 +46,17 @@ std::string  const &Message::getCommand() const
     return this->command;
 }
 
+size_t      const Message::getParamSize()
+{
+    return parameters.size();
+}
+
 std::vector<std::string>  const &Message::getParameters() const 
 {
     return parameters;
 }
 
-std::string  const &Message::getParametersIndex(int index) const 
+std::string  const Message::getParametersIndex(int index)
 {
     return parameters[index];
 }

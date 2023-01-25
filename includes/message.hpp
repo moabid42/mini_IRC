@@ -6,7 +6,7 @@
 /*   By: moabid <moabid@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/21 17:36:01 by moabid            #+#    #+#             */
-/*   Updated: 2023/01/22 11:53:20 by moabid           ###   ########.fr       */
+/*   Updated: 2023/01/25 15:31:19 by moabid           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@ class Message
 
         std::string const &getPrefix() const;
         std::string const &getCommand() const;
+        size_t      const getParamSize();
         std::vector<std::string> const &getParameters() const;
-        std::string const &getParametersIndex(int index) const;
+        std::string const getParametersIndex(int index);
 };

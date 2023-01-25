@@ -6,7 +6,7 @@
 /*   By: moabid <moabid@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/22 19:05:09 by moabid            #+#    #+#             */
-/*   Updated: 2023/01/24 11:08:04 by moabid           ###   ########.fr       */
+/*   Updated: 2023/01/25 15:43:13 by moabid           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,4 +40,5 @@ class Channel
         void addMode(std::string mode, std::string param);
         void removeMode(std::string mode);
         void broadcastMessage(std::string message);
+        void printUsers() const;
 };
