@@ -1,34 +1,31 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   message.hpp                                        :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: moabid <moabid@student.42.fr>              +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/01/21 17:36:01 by moabid            #+#    #+#             */
-/*   Updated: 2023/01/25 15:31:19 by moabid           ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
+#ifndef MESSAGE_HPP
+#define	MESSAGE_HPP
 
-#pragma once
-
-#include "irc.hpp"
+#include <string>
+#include <vector>
+#include <iostream>
 
 class Message
 {
-    private:
-        std::string                 prefix;
-        std::string                 command;
-        std::vector<std::string>    parameters;
-        
-    public:
-        Message();
-        Message(std::string prefix, std::string cmd, std::vector<std::string> params);
-        ~Message();
+protected:
+	std::string					_msg; //the whole thing
+	std::string					_prefix;//starts with ':' followed by sender eg. :doctor!doctor@baz.example.org ...
+	std::string					_cmd; //1 word
+	std::vector<std::string>	_params; //comand parameters
+	bool						_complete; //if the msg containe portion of the message and not all of it (it does not end with \r\n)
+public:
+	Message();
+	~Message();
 
-        std::string const &getPrefix() const;
-        std::string const &getCommand() const;
-        size_t      const getParamSize();
-        std::vector<std::string> const &getParameters() const;
-        std::string const getParametersIndex(int index);
+	void						append(const char* buffer);
+	void						parse_msg(void);
+
+	std::string					get_msg(void) const;
+	std::string					get_prefix(void) const;
+	std::string					get_cmd(void) const;
+	std::vector<std::string>	get_params(void) const;
+	bool						is_complete(void) const;
+	void						clear(void);
 };
+
+#endif
